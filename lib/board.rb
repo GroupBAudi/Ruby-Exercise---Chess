@@ -1,4 +1,7 @@
-class Board
+require_relative 'pieces'
+
+# Holds all logic related to positioning and collisions
+class Board < Piece
   attr_reader :grid
 
   def initialize
