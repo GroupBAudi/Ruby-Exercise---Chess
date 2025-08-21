@@ -52,9 +52,9 @@ class Pawn < Piece
 
   def moves(position, board)
     puts "Moves available:"
-    available_moves
+    options = available_moves(position, board)
     puts "Pick your move: "
-    @current_pos = moves[player_input]
+    @current_pos = options[player_input]
   end
 
   def player_input
