@@ -7,7 +7,7 @@ class Pawn < Piece
   PAWN_MOVES = {
     special_move: [[0, 2]],
     move: [[0, 1]],
-    capture: [[1, 1], [-1, 1]]
+    capture: [[-1, 1], [1, 1]]
   }
 
   attr_reader :current_pos, :color
@@ -21,33 +21,48 @@ class Pawn < Piece
   def valid_moves(position, board)
     x, y = position
     direction = @color == 'white' ? 1 : -1
-    moves = []
+    moves = {}
+    i = 0
 
     PAWN_MOVES.each do |key, value|
       next if key == :special_move && position != @current_pos
-      
-      value.each do |dx, dy|
+    
+      value.each do |dx, dy|    
         new_x = x + dx
         new_y = y + dy * direction
 
         # should be between current_position at board to max board row and column
-        moves << [new_x, new_y] if new_x.between?(0, board.grid.length - 1) && new_y.between?(0, board.grid.length - 1)
+        if new_x.between?(0, board.grid.length - 1) && new_y.between?(0, board.grid.length - 1)
+          moves[i] = [new_x, new_y] 
+          i += 1
+        end
       end
+    end
+    # make moves into hash
+    moves
+  end
+
+  def available_moves(position, board)
+    moves = valid_moves(position, board)
+    moves.each do |k, v|
+      puts "##{k}: #{v}"
     end
     moves
   end
 
-  def bfs(start, target)
-    bfs(start, target)
+  def moves(position, board)
+    puts "Moves available:"
+    available_moves
+    puts "Pick your move: "
+    @current_pos = moves[player_input]
   end
 
-  def moves(start, target, position)
-    # use a queue to explore positions
-    # track visited squares
-    # store parent relationships to reconstruct path
-  end
+  def player_input
+    loop do
+      user_input = gets.chomp
+      return user_input.to_i if user_input.match?(/^\d+$/)
 
-  def build_path(parent, target)
-    # reconstruct path from start to target using parent's hash
+      puts "Invalid move"
+    end
   end
 end
