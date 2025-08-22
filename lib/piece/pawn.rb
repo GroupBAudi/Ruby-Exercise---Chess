@@ -10,7 +10,9 @@ class Pawn < Piece
     capture: [[-1, 1], [1, 1]]
   }
 
-  attr_reader :current_pos, :color
+  attr_accessor :current_pos
+  attr_reader :color
+  # attr_reader :current_pos, :color
 
   def initialize(color, symbol = "♟", position = [0, 0])
     super(color, symbol, position) # calls Piece#initialize
@@ -21,32 +23,54 @@ class Pawn < Piece
   def valid_moves(position, board)
     x, y = position
     direction = @color == 'white' ? 1 : -1
-    moves = {}
-    i = 0
+    moves = []
 
     PAWN_MOVES.each do |key, value|
       next if key == :special_move && position != @current_pos
-    
+      next if key == :capture
+
       value.each do |dx, dy|    
         new_x = x + dx
         new_y = y + dy * direction
 
         # should be between current_position at board to max board row and column
         if new_x.between?(0, board.grid.length - 1) && new_y.between?(0, board.grid.length - 1)
-          moves[i] = [new_x, new_y] 
-          i += 1
+          moves << [new_x, new_y]
         end
       end
     end
-    # make moves into hash
     moves
+  end
+  
+  def valid_capture_moves(position, board)
+    # returns true when there's nothing to capture
+    x, y = position
+    direction = @color == 'white' ? 1 : -1
+    captures = []
+    
+    PAWN_MOVES[:capture].any? do |dx, dy|
+      new_x = x + dx
+      new_y = y + dy
+
+      next unless new_x.between?(0, board.grid.length - 1) && new_y.between?(0, board.grid.length - 1)
+
+      target = board.grid[new_x][new_y]
+      if target && target.color != @color
+        captures << [new_x, new_y]
+      end
+    end
+    captures
   end
 
   def available_moves(position, board)
-    moves = valid_moves(position, board)
-    moves.each do |k, v|
-      puts "##{k}: #{v}"
+    array = valid_moves(position, board) + valid_capture_moves(position, board)
+    moves = {}
+    i = 0
+
+    array.each_with_index do |cell, i|
+      moves[i] = cell.flatten
     end
+
     moves
   end
 
@@ -66,3 +90,22 @@ class Pawn < Piece
     end
   end
 end
+
+#   0 1 2 3 4 5 6 7 
+#  brevity brevity
+# 3 · · · · · · · ·
+# 2 . . ♙ · · · · ·
+# 1 . ♙ · · · · · ·
+# 0 . . . . . . . .
+
+# me when primitive debugging
+
+# white = Pawn.new('white')
+# black = Pawn.new('black')
+# board = Board.new
+# position_white = [1, 1]
+# board.grid[2][2] = black
+# p white.available_moves(position_white, board) 
+# white.moves(position_white, board)
+# p white.current_pos
+
