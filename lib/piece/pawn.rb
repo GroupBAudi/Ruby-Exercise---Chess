@@ -1,5 +1,4 @@
 require_relative '../pieces'
-require_relative '../board'
 
 # Holds all logic to pawn including forward movement, diagonal capture, en passant, promotions
 # Can move two pieces if hasn't moved yet
@@ -10,19 +9,21 @@ class Pawn < Piece
     capture: [[-1, 1], [1, 1]]
   }
 
-  attr_accessor :current_pos
-  attr_reader :color
-  # attr_reader :current_pos, :color
+  # attr_accessor :current_pos
+  # attr_reader :color
+  attr_reader :color, :current_pos, :symbol
 
-  def initialize(color, symbol = "♟", position = [0, 0])
-    super(color, symbol, position) # calls Piece#initialize
+  def initialize(color, position)
+    super(color, position) # calls Piece#initialize
     @current_pos = position
+    @symbol = color == :white ? "♙" : "♟"
   end
 
   # checks available moves based on the board to prevent collision
   def valid_moves(position, board)
     x, y = position
-    direction = @color == 'white' ? 1 : -1
+    # White starts at index 6 (second bottom row)
+    direction = @color == 'white' ? -1 : 1
     moves = []
 
     PAWN_MOVES.each do |key, value|
@@ -45,7 +46,7 @@ class Pawn < Piece
   def valid_capture_moves(position, board)
     # returns true when there's nothing to capture
     x, y = position
-    direction = @color == 'white' ? 1 : -1
+    direction = @color == 'white' ? -1 : 1
     captures = []
     
     PAWN_MOVES[:capture].any? do |dx, dy|
@@ -77,6 +78,7 @@ class Pawn < Piece
   def moves(position, board)
     puts "Moves available:"
     options = available_moves(position, board)
+    puts options
     puts "Pick your move: "
     @current_pos = options[player_input]
   end
@@ -91,21 +93,16 @@ class Pawn < Piece
   end
 end
 
-#   0 1 2 3 4 5 6 7 
-#  brevity brevity
-# 3 · · · · · · · ·
-# 2 . . ♙ · · · · ·
-# 1 . ♙ · · · · · ·
-# 0 . . . . . . . .
-
 # me when primitive debugging
 
-# white = Pawn.new('white')
-# black = Pawn.new('black')
+# require_relative '../board'
+
 # board = Board.new
-# position_white = [1, 1]
-# board.grid[2][2] = black
-# p white.available_moves(position_white, board) 
-# white.moves(position_white, board)
-# p white.current_pos
+# board.grid[4][5] = Pawn.new(:white, [4, 3])
+# white = board.grid[4][5]
+# board.grid[5][4] = Pawn.new(:black, [5, 4])
+# black = board.grid[5][4]
+# p white.available_moves([4, 3], board)
+# p black.available_moves([5, 4], board)
+# board.render
 
