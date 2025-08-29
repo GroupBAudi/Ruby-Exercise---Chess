@@ -8,7 +8,6 @@ class Board
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
-    @removed_piece = [] # temporary to hold captured piece until player.rb is created
   end
 
   def setup_pieces
@@ -22,35 +21,35 @@ class Board
     end
   end
 
-  def move_piece(from, to)
-    # piece = grab whatever is at `from`
-    # if piece exists AND to is in piece's legal moves
-    #     if target square occupied by enemy → capture it
-    #     move piece in @grid
-    #     update piece.current_pos
-    # else
-    #     reject move
+  def move_piece(current_player, from, to)
     from_row, from_col = from
     target_row, target_col = to
     piece = @grid[from_row][from_col]
     target = @grid[target_row][target_col]
     if piece # if piece exists
-      capture(to)
-      @grid[target_row][target_col] = piece
-      @grid[from_row][from_col] = nil
-      piece.current_pos = [target_row, target_col]
+      capture(current_player, to)
+      place_piece(from, to, piece)
     else
       puts "Move rejected"
     end
   end
 
-  def capture(position)
+  def place_piece(from, to, piece)
+    from_row, from_col = from
+    target_row, target_col = to
+
+    @grid[target_row][target_col] = piece
+    @grid[from_row][from_col] = nil
+    piece.current_pos = [target_row, target_col]
+  end
+
+  def capture(current_player, position)
     row, col = position
     target = @grid[row][col]
 
     return unless target
     @grid[row][col] = nil
-    @removed_piece << target
+    current_player.captured_pieces << target
   end
 
   def render
