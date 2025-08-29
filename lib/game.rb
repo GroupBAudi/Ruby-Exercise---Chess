@@ -18,7 +18,7 @@ class Game
   end
 
   def correct_player_piece?(row, col)
-    @current_player.color == @board.grid[row.to_i][col.to_i].color
+    @current_player.color == @board.grid[row][col].color
   end
 
   def check_row(row)
@@ -52,7 +52,7 @@ class Game
       col = player_input_col(row.to_i)
       puts "You picked #{col} as column"
 
-      return [row, col] if correct_player_piece?(row, col)
+      return [row.to_i, col.to_i] if correct_player_piece?(row.to_i, col.to_i)
       puts "Rejected. Current player is #{@current_player.name} as #{@current_player.color}"
     end
   end
@@ -64,23 +64,23 @@ class Game
     puts "Choose move"
     puts available_moves
     player_input = gets.chomp
-    move_piece(available_moves, piece, player_input)
+    move_piece(@current_player, available_moves, piece, player_input)
     @board.render
     swap_turn
   end
 
   def get_piece(player_input)
     row, col = player_input
-    board.grid[row.to_i][col.to_i]
+    board.grid[row][col]
   end
 
   def show_available_moves(piece)
     piece.available_moves(@board)
   end
 
-  def move_piece(available_moves, piece, player_input)
+  def move_piece(current_player, available_moves, piece, player_input)
     move_chosen = available_moves[player_input.to_i]
-    @board.move_piece(piece.current_pos, move_chosen)
+    @board.move_piece(current_player, piece.current_pos, move_chosen)
   end
 end
 
