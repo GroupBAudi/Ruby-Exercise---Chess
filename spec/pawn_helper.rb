@@ -1,5 +1,6 @@
 require '../lib/piece/pawn.rb'
 require '../lib/board.rb'
+require '../lib/player.rb'
 
 describe Pawn do
   describe '#valid_moves' do
@@ -188,6 +189,124 @@ describe Pawn do
         moves = pawn_black.valid_capture_moves(board)
 
         expect(moves).to_not include([4, 6])
+      end
+    end
+  end
+
+  describe '#en_passant' do
+    context 'when pawn is white' do
+      let(:board) { Board.new }
+      let(:player_one) { Player.new("Player One", :white) }
+      subject(:pawn_white) { described_class.new(:white, [6, 1]) }
+
+      before do
+        board.grid[6][1] = pawn_white
+      end
+
+      it 'sets en_passant flag as true if move two steps' do
+        target_position = [4, 1]
+        board.move_piece(player_one, [6, 1], target_position)
+        expect(pawn_white.en_passant).to eq(true)
+      end
+
+      it 'sets en passant flag as false if move one step' do
+        target_position = [5, 1]
+        board.move_piece(player_one, [6, 1], target_position)
+        expect(pawn_white.en_passant).to eq(false)
+      end
+
+      it 'sets en passant flag as false if move two different steps' do
+        board.move_piece(player_one, [6, 1], [5, 1])
+        board.move_piece(player_one, [5, 1], [4, 1])
+        expect(pawn_white.en_passant).to eq(false)
+      end
+    end
+
+    context 'when pawn is black' do
+      let(:board) { Board.new }
+      let(:player_one) { Player.new("Player One", :black) }
+      subject(:pawn_black) { described_class.new(:black, [1, 2]) }
+
+      before do
+        board.grid[1][2] = pawn_black
+      end
+
+      it 'sets en_passant flag as true if move two steps' do
+        target_position = [3, 2]
+        board.move_piece(player_one, [1, 2], target_position)
+        expect(pawn_black.en_passant).to eq(true)
+      end
+
+      it 'sets en passant flag as false if move one step' do
+        target_position = [2, 2]
+        board.move_piece(player_one, [1, 2], target_position)
+        expect(pawn_black.en_passant).to eq(false)
+      end
+
+      it 'sets en passant flag as false if move two different steps' do
+        board.move_piece(player_one, [1, 2], [2, 2])
+        board.move_piece(player_one, [2, 2], [3, 2])
+        expect(pawn_black.en_passant).to eq(false)
+      end
+    end
+  end
+
+  describe '#valid_enpassant_move' do
+    context 'when pawn is white' do
+      let(:board) { Board.new }
+      let(:player_one) { Player.new("Player One", :white) }
+      let(:player_two) { Player.new("Player Two", :black) }
+      subject(:pawn_white) { described_class.new(:white, [3, 1]) }
+
+      before do
+        board.grid[3][1] = pawn_white
+      end
+
+      it 'returns a move that allows for en passant if pawn is at right' do
+        pawn_black = Pawn.new(:black, [1, 2])
+        board.grid[1][2] = pawn_black
+        board.move_piece(player_two, [1, 2], [3, 2]) # moves two step
+        moves = pawn_white.valid_enpassant_move(board)
+
+        expect(moves).to include([2, 2])
+      end
+
+      it 'returns a move that allows for en passant if pawn is at left' do
+        pawn_black = Pawn.new(:black, [1, 0])
+        board.grid[1][0] = pawn_black
+        board.move_piece(player_two, [1, 0], [3, 0]) # moves two step
+        moves = pawn_white.valid_enpassant_move(board)
+
+        expect(moves).to include([2, 0])
+      end
+    end
+
+    context 'when pawn is black' do
+      let(:board) { Board.new }
+      let(:player_one) { Player.new("Player One", :white) }
+      let(:player_two) { Player.new("Player Two", :black) }
+      subject(:pawn_black) { described_class.new(:black, [4, 4]) }
+
+      before do
+        board.grid[4][4] = pawn_black
+      end
+
+      it 'returns a move that allows for en passant if pawn is at right' do
+        pawn_white = Pawn.new(:white, [6, 5])
+        board.grid[6][5] = pawn_white
+        board.move_piece(player_two, [6, 5], [4, 5]) # moves two step
+        moves = pawn_black.valid_enpassant_move(board)
+
+        expect(moves).to include([5, 5])
+      end
+
+      it 'returns a move that allows for en passant if pawn is at left' do
+        pawn_white = Pawn.new(:white, [6, 3])
+        board.grid[6][3] = pawn_white
+        board.move_piece(player_two, [6, 3], [4, 3]) # moves two step
+        moves = pawn_black.valid_enpassant_move(board)
+
+        expect(moves).to include([5, 3])
       end
     end
   end
