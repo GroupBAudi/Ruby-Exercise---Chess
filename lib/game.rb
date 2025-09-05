@@ -17,61 +17,66 @@ class Game
     @current_player = (@current_player == @player_one) ? @player_two : @player_one
   end
 
-  def correct_player_piece?(row, col)
-    @current_player.color == @board.grid[row][col].color
-  end
-
-  def check_row(row)
-    @board.grid[row].none? { |col| col.nil? }
-  end
-
-  def player_input_row
-    loop do
-      row_input = gets.chomp
-      return row_input if row_input.match?(/^\d+$/) && check_row(row_input.to_i)
-      
-      puts "Enter a valid input from 0 to #{board.grid.length - 1}"
+  def correct_player_piece?(player_input)
+    row, col = player_input
+    piece = @board.grid[row][col]
+    if @current_player.color != piece.color
+      puts "#{reparse(player_input)} is #{piece.color}'s piece"
+      return false
     end
+    true
   end
 
-  def player_input_col(row)
-    loop do
-      col_input = gets.chomp
-      return col_input if col_input.match(/^\d+$/) && @board.grid[row][col_input.to_i]
-
-      puts "Enter a valid input from 0 to #{board.grid[0].length - 1}"
+  def spot_empty?(player_input)
+    row, col = player_input
+    if @board.grid[row][col].nil?
+      puts "#{reparse(player_input)} is empty"
+      return false
     end
+    true
   end
 
   def player_input
     loop do
-      puts "Choose row"
-      row = player_input_row
-      puts "You picked #{row} as row"
-      puts "Choose column"
-      col = player_input_col(row.to_i)
-      puts "You picked #{col} as column"
-
-      return [row.to_i, col.to_i] if correct_player_piece?(row.to_i, col.to_i)
-      puts "Rejected. Current player is #{@current_player.name} as #{@current_player.color}"
+      input = gets.chomp.strip.slice(0, 2)
+      player_input = parse(input)
+      verified_input = input.match?(/^[a-h][1-8]$/i) && spot_empty?(player_input)
+      return player_input if verified_input && correct_player_piece?(player_input)
     end
   end
 
+  def parse(player_input)
+    row = (player_input[1].to_i - 8).abs
+    col = player_input[0].downcase.ord - 97 # 0 based indexing
+
+    [row, col]
+  end
+
+  def reparse(player_input)
+    letter = (player_input[1] + 97).chr
+    number = (player_input[0] - 8).abs
+
+    coord = letter.to_s + number.to_s
+  end
+
   def play_turn
-    @board.render
-    piece = get_piece(player_input)
-    available_moves = show_available_moves(piece)
-    puts "Choose move"
-    puts available_moves
-    player_input = gets.chomp
-    move_piece(@current_player, available_moves, piece, player_input)
-    @board.render
-    swap_turn
+    loop do
+      @board.render
+      piece = get_piece(player_input)
+      available_moves = show_available_moves(piece)
+      puts "Choose move"
+      puts available_moves
+      player_input = gets.chomp
+      move_piece(@current_player, available_moves, piece, player_input)
+      @board.render
+      puts ""
+      swap_turn
+    end
   end
 
   def get_piece(player_input)
     row, col = player_input
-    board.grid[row][col]
+    @board.grid[row][col]
   end
 
   def show_available_moves(piece)
@@ -86,3 +91,4 @@ end
 
 game = Game.new
 game.play_turn
+
