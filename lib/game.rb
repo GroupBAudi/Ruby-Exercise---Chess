@@ -1,9 +1,12 @@
 require_relative 'board'
 require_relative 'player'
+require_relative 'helpers/board_parser'
 
 class Game
   attr_reader :board
   attr_accessor :current_player
+
+  include BoardParser
 
   def initialize(board = Board.new)
     @board = board
@@ -43,20 +46,6 @@ class Game
       verified_input = input.match?(/^[a-h][1-8]$/i) && spot_empty?(player_input)
       return player_input if verified_input && correct_player_piece?(player_input)
     end
-  end
-
-  def parse(player_input)
-    row = (player_input[1].to_i - 8).abs
-    col = player_input[0].downcase.ord - 97 # 0 based indexing
-
-    [row, col]
-  end
-
-  def reparse(player_input)
-    letter = (player_input[1] + 97).chr
-    number = (player_input[0] - 8).abs
-
-    coord = letter.to_s + number.to_s
   end
 
   def play_turn
