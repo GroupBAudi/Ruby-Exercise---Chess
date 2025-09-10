@@ -38,7 +38,7 @@ class Board
     if !target.nil?
       # if piece exists and target is occupied
       capture(from, to, piece, current_player)
-    elsif piece.is_a?(Pawn) && piece.valid_enpassant_move(self) == [to]
+    elsif piece.is_a?(Pawn) && piece.valid_en_passant_move(self) == [to]
       # if piece is a pawn and has en passant move available
       en_passant_capture(from, to, piece, current_player)
     else
