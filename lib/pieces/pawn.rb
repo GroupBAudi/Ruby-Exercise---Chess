@@ -84,11 +84,9 @@ class Pawn < Piece
 
   def en_passant?(board)
     start_row = @default_position[0]
-    x, y = @current_pos
-    last_x, last_y = @last_pos.last
+    x = @current_pos[0]
+    last_x = @last_pos.last[0]
     moved_two_step = last_x == start_row && (x - last_x).abs == 2
-    
-    p @last_pos.last
 
     if moved_two_step
       @en_passant = true
