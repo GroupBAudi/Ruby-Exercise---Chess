@@ -108,121 +108,13 @@ class Pawn < Piece
 
     move
   end
+
+  def reset_en_passant_flag(board)
+
+    last_pos = self.last_pos
+    # if self en passant is true AND board has move 
+    if last_pos.length > 1
+      self.en_passant = false
+    end
+  end
 end
-
-# require_relative '../board'
-
-# board = Board.new
-
-# position_white = [6, 1]
-# white_pawn = Pawn.new(:white, position_white)
-# wx, wy = position_white
-# board.grid[wx][wy] = white_pawn
-# white_pawn.last_pos << position_white
-
-# board.render
-# puts ""
-
-# white_pawn.last_pos << position_white
-# board.grid[wx][wy] = nil
-# position_white = [4, 1]
-# wx, wy = position_white
-# board.grid[wx][wy] = white_pawn
-# white_pawn.current_pos = position_white
-
-# board.render
-# puts ""
-
-# board.grid[wx][wy] = nil
-# position_white = [3, 1]
-# wx, wy = position_white
-# board.grid[wx][wy] = white_pawn
-# white_pawn.current_pos = position_white
-
-# board.render
-# puts ""
-
-# position_black = [1, 2]
-# black_pawn = Pawn.new(:black, position_black)
-# bx, by = position_black
-# board.grid[bx][by] = black_pawn
-
-# board.render
-# puts ""
-
-# black_pawn.last_pos << position_black
-# board.grid[bx][by] = nil
-# position_black = [3, 2]
-# bx, by = position_black
-# board.grid[bx][by] = black_pawn
-# black_pawn.current_pos = position_black
-
-# board.render
-# # stubs black pawn
-# p black_pawn.en_passant?(board) # true
-# p white_pawn.available_moves(board)
-# puts ""
-
-# board.render
-# p white_pawn.valid_moves(board)
-
-# position_black = [5, 1]
-# bx, by = position_black
-# board.grid[bx][by] = Pawn.new(:black, position_black)
-# black_pawn = board.grid[bx][by]
-
-# board.render
-# p white_pawn.valid_moves(board)
-
-# board.grid[bx][by] = nil
-
-# position_black = [4, 1]
-# bx, by = position_black
-# board.grid[bx][by] = Pawn.new(:black, position_black)
-# black_pawn = board.grid[bx][by]
-
-# board.render
-# p white_pawn.valid_moves(board)
-# board.grid[bx][by] = nil
-
-# position_black = [3, 1]
-# bx, by = position_black
-# board.grid[bx][by] = Pawn.new(:black, position_black)
-# black_pawn = board.grid[bx][by]
-
-# board.render
-# p white_pawn.valid_moves(board)
-
-# black version
-
-# position_white = [4, 1]
-# wx, wy = position_white
-# board.grid[wx][wy] = Pawn.new(:white, position_white)
-# white_pawn = board.grid[wx][wy]
-
-# position_black = [3, 1]
-# bx, by = position_black
-# board.grid[bx][by] = Pawn.new(:black, position_black)
-# black_pawn = board.grid[bx][by]
-
-# board.render
-# p black_pawn.valid_moves(board)
-
-# board.grid[wx][wy] = nil
-
-# position_white = [5, 1]
-# wx, wy = position_white
-# board.grid[wx][wy] = Pawn.new(:white, position_white)
-# white_pawn = board.grid[wx][wy]
-
-# board.render
-# p black_pawn.valid_moves(board)
-# board.grid[wx][wy] = nil
-
-# position_white = [6, 1]
-# wx, wy = position_white
-# board.grid[wx][wy] = Pawn.new(:white, position_white)
-# white_pawn = board.grid[wx][wy]
-
-# board.render
-# p black_pawn.valid_moves(board)
