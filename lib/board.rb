@@ -87,7 +87,7 @@ class Board
     set_piece_at(from, nil)
     piece.current_pos = [target_row, target_col]
     # flag a pawn with en passant if moving pawn class
-    piece.en_passant?(self) if piece.is_a?(Pawn)
+    piece.after_move(self)
     # expire en passant if opportunity wasted
     expire_enpassant
   end

@@ -11,4 +11,7 @@ class Piece
 
   def moves
   end
+
+  def after_move(board)
+  end
 end
