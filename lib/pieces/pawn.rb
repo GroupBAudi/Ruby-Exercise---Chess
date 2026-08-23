@@ -109,8 +109,12 @@ class Pawn < Piece
     move
   end
 
-    def after_move(board)
+  def after_move(board)
     # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
     en_passant?(board)
+  end
+
+  def expire_move_state
+    self.en_passant = false
   end
 end
