@@ -108,13 +108,4 @@ class Pawn < Piece
 
     move
   end
-
-  def reset_en_passant_flag(board)
-
-    last_pos = self.last_pos
-    # if self en passant is true AND board has move 
-    if last_pos.length > 1
-      self.en_passant = false
-    end
-  end
 end
