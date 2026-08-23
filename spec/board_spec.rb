@@ -92,6 +92,9 @@ describe Board do
       end
 
       it 'no en passant capture available if other pieces moved' do
+        pawn_black = Pawn.new(:black, [1, 0])
+        board.grid[1][0] = pawn_black
+        board.move_piece([1, 0], [3, 0])
         pawn = Pawn.new(:white, [6, 3])
         board.grid[6][3] = pawn
         board.move_piece([6, 3], [5, 3])
@@ -123,6 +126,9 @@ describe Board do
       end
 
       it 'no en passant capture available if other pieces moved' do
+        pawn_white = Pawn.new(:white, [6, 3])
+        board.grid[6][3] = pawn_white
+        board.move_piece([6, 3], [4, 3])
         pawn_white = Pawn.new(:white, [6, 2])
         board.grid[6][2] = pawn_white
         board.move_piece([6, 2], [4, 2])
