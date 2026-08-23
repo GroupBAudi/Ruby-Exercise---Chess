@@ -69,14 +69,11 @@ class Board
     }
   end
 
-  def expire_enpassant
-    if @move_history.length >= 2
-      last_move = @move_history[-2][:piece]
+  def expire_move_state
+    return if @move_history.length < 2
 
-      if last_move.is_a?(Pawn)
-        last_move.en_passant = false
-      end
-    end
+    previous_piece = @move_history[-2][:piece]
+    previous_piece.expire_move_state
   end
 
   def place_piece(from, to, piece)
@@ -89,7 +86,7 @@ class Board
     # flag a pawn with en passant if moving pawn class
     piece.after_move(self)
     # expire en passant if opportunity wasted
-    expire_enpassant
+    expire_move_state
   end
 
   def capture(from, to, piece)

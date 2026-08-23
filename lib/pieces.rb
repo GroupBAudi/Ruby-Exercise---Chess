@@ -14,4 +14,7 @@ class Piece
 
   def after_move(board)
   end
+
+  def expire_move_state
+  end
 end
