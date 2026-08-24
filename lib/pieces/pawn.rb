@@ -109,6 +109,14 @@ class Pawn < Piece
     move
   end
 
+  def en_passant_capture_position(to)
+    # to get the coord behind the advancing pawn after executing enpassant
+    direction = color == :white ? 1 : -1
+    target_row, target_col = to
+
+    [target_row + direction, target_col]
+  end
+
   def after_move(board)
     # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
     en_passant?(board)

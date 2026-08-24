@@ -100,9 +100,7 @@ class Board
   end
 
   def en_passant_capture(from, to, piece)
-    direction = piece.color == :white ? 1 : -1
-    target_row, target_col = to
-    target_coord = [target_row + direction, target_col]
+    target_coord = piece.en_passant_capture_position(to)
 
     dead_pawn = piece_at(target_coord)
     set_piece_at(target_coord, nil)
@@ -121,52 +119,18 @@ end
 
 # # seperator piggies certified OSHA more like Oink-SHA ##
 
-# # case 1: white move 2, then 1, followed by black move 2
 # # white
 # board.move_piece([6, 1], [4, 1])
 # # black
 # board.move_piece([1, 2], [3, 2])
 # # white
 # board.move_piece([4, 1], [3, 1])
+# # black
+# board.move_piece([1, 0], [3, 0])
 # board.render
 # puts ""
 
 # white = board.piece_at([3, 1])
-# black = board.piece_at([3, 2])
-# p white.available_moves(board)
-
-# # expected result: no en passant move
-# # result: yep
-
-# p " ##### Oink-SHAA CERTIFIED SEPERATOR ##### "
-
-# # case 2: another pawn move beside white
-# puts ""
-
-# board.move_piece([1, 0], [3, 0])
-# board.render
-
-# p white.available_moves(board)
-
-# puts ""
-# board.move_piece([3, 1], [2, 0])
-
-# board.render
-
-# expected result: one en passant move
-# result: yep, I even bit it
-
-# case 1.5 white move 2, then 1, followed by black move 2 (mental gymnastics)
-# white
-# board.move_piece([6, 1], [4, 1])
-# # black
-# board.move_piece([1, 0], [3, 0])
-# # white
-# board.move_piece([4, 1], [3, 1])
-# # black
-# board.move_piece([1, 2], [3, 2])
-# board.render
-# puts ""
-
-# white = board.piece_at([3, 1])
-# p white.available_moves(board)
+# # black = board.piece_at([3, 2])
+# # p white.available_moves(board)
+# p white.valid_en_passant_move(board)
