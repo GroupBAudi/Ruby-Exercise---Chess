@@ -125,4 +125,13 @@ class Pawn < Piece
   def expire_move_state
     self.en_passant = false
   end
+
+  def special_capture_position(board, to)
+    return nil unless valid_en_passant_move(board).include? (to)
+
+    en_passant_capture_position(to)
+  end
+
+  def unusual_move
+  end
 end

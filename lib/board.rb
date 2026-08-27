@@ -38,12 +38,13 @@ class Board
   end
 
   def move_to(from, to, piece)
+    special_capture = piece.special_capture_position(self, to)
     if capturing_condition(to)
       # if piece exists and target is occupied
       capture(from, to, piece)
-    elsif piece.is_a?(Pawn) && piece.valid_en_passant_move(self) == [to]
+    elsif special_capture
       # if piece is a pawn and has en passant move available
-      en_passant_capture(from, to, piece)
+      capture(from, to, piece, special_capture)
     else
       # just place piece if anything
       place_piece(from, to, piece)
@@ -52,13 +53,22 @@ class Board
   end
 
   def piece_at(position) # getter
+    # What occupies this square?
     x, y = position
     @grid[x][y]
   end
 
   def set_piece_at(position, value) # setter
+    # Put this value on this square
     x, y = position
     @grid[x][y] = value
+  end
+
+  def remove_piece(position)
+    # Remove and return what's on this square
+    piece = piece_at(position)
+    set_piece_at(position, nil)
+    piece
   end
 
   def add_history(piece, current_position, target)
@@ -89,24 +99,12 @@ class Board
     expire_move_state
   end
 
-  def capture(from, to, piece)
-    target = piece_at(to)
-
-    set_piece_at(to, nil)
+  def capture(from, to, piece, capture_position = to)
+    # move piece from from to to, while removing the piece at capture_position
+    # where unless en passant, remove the occuppying grid on opponent piece pos
+    target = remove_piece(capture_position)
     place_piece(from, to, piece)
-
-    # return the dead piece to whoever asked for the move
     target
-  end
-
-  def en_passant_capture(from, to, piece)
-    target_coord = piece.en_passant_capture_position(to)
-
-    dead_pawn = piece_at(target_coord)
-    set_piece_at(target_coord, nil)
-    place_piece(from, to, piece)
-
-    dead_pawn
   end
 end
 
@@ -133,4 +131,3 @@ end
 # white = board.piece_at([3, 1])
 # # black = board.piece_at([3, 2])
 # # p white.available_moves(board)
-# p white.valid_en_passant_move(board)
