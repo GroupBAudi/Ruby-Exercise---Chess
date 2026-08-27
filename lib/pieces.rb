@@ -17,4 +17,8 @@ class Piece
 
   def expire_move_state
   end
+
+  def special_capture_position(board, to)
+    nil
+  end
 end
