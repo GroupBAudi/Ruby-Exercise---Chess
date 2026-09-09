@@ -1,5 +1,7 @@
 require_relative 'pieces'
 require_relative 'pieces/pawn'
+require_relative 'pieces/rook'
+require_relative 'pieces/bishop'
 require_relative 'helpers/renderer'
 
 # Holds all logic related to positioning and collisions
@@ -19,9 +21,20 @@ class Board
     # white and black pawns as well as super pieces 
 
     # setup pawns
-    (0..7).each do |col|
-      @grid[6][col] = Pawn.new(:white, [6, col])
-      @grid[1][col] = Pawn.new(:black, [1, col])
+    # (0..7).each do |col|
+    #   @grid[6][col] = Pawn.new(:white, [6, col])
+    #   @grid[1][col] = Pawn.new(:black, [1, col])
+    # end
+  
+    # skeleton in closet:
+    @grid[0][2] = Bishop.new(:black, [0, 2])
+    @grid[0][5] = Bishop.new(:black, [0, 5])
+    @grid[7][2] = Bishop.new(:white, [7, 2])
+    @grid[7][5] = Bishop.new(:white, [7, 5])
+
+    [0, 7].each do |col| 
+      @grid[7][col] = Rook.new(:white, [7, col])
+      @grid[0][col] = Rook.new(:black, [0, col])
     end
   end
 
@@ -108,26 +121,28 @@ class Board
   end
 end
 
-# board = Board.new
+board = Board.new
 
-# board.setup_pieces
-# board.render
+board.setup_pieces
 
-# puts ""
+puts ""
 
-# # seperator piggies certified OSHA more like Oink-SHA ##
+# main
+board.grid[4][7] = Bishop.new(:white, [4, 7])
 
-# # white
-# board.move_piece([6, 1], [4, 1])
-# # black
-# board.move_piece([1, 2], [3, 2])
-# # white
-# board.move_piece([4, 1], [3, 1])
-# # black
-# board.move_piece([1, 0], [3, 0])
-# board.render
-# puts ""
+# # ally test
+# board.grid[1][4] = Bishop.new(:white, [1, 4])
+# # enemy test
+# board.grid[6][2] = Bishop.new(:black, [6, 2])
+# board.grid[6][6] = Bishop.new(:black, [6, 6])
+# board.grid[2][2] = Bishop.new(:black, [2, 2])
+# board.grid[2][6] = Bishop.new(:black, [2, 6])
 
-# white = board.piece_at([3, 1])
-# # black = board.piece_at([3, 2])
-# # p white.available_moves(board)
+
+x = board.piece_at([4, 7])
+
+board.render
+
+p x.valid_moves(board)
+# p x.valid_capture_moves(board)
+# p x.available_moves(board)
