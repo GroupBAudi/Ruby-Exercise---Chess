@@ -59,9 +59,9 @@ describe Rook do
       it 'stops movement at the enemy piece' do
         board.grid[6][4] = Rook.new(:white, [6, 4]) # e2
 
-        vertical_moves = rook.valid_moves(board).sort
+        moves = rook.valid_moves(board).sort
 
-        expect(vertical_moves).to_not include([6, 4])
+        expect(moves).to_not include([6, 4])
       end
     end
   end
