@@ -1,5 +1,6 @@
 require_relative '../pieces'
 require_relative '../helpers/board_parser'
+require_relative '../helpers/sliding_movement'
 
 # Holds all logic to Rook including moving in straight lines including capture, and castling
 class Rook < Piece
@@ -13,7 +14,7 @@ class Rook < Piece
   attr_reader :color, :symbol, :default_position
   attr_accessor :current_pos, :castle, :last_pos
 
-  include BoardParser
+  include BoardParser, SlidingMovement
 
   def initialize(color, position)
     super(color, position) # calls Piece#initialize
@@ -34,44 +35,6 @@ class Rook < Piece
 
   def opponent_piece?(row, col, board)
     board.grid[row][col].color != @color
-  end
-
-  def valid_moves(board)
-    x, y = @current_pos
-    moves = []
-
-    DIRECTIONS.each do |dx, dy|
-      i = 1
-      while within_boundary?(x + i * dx, y + i * dy, board) && empty?(x + i * dx, y + i * dy, board)
-        
-        new_x = x + i * dx
-        new_y = y + i * dy      
-
-        moves << [new_x, new_y]
-        i += 1
-      end
-    end
-    moves
-  end
-  
-  def valid_capture_moves(board)
-    x, y = @current_pos
-    moves = []
-
-    DIRECTIONS.each do |dx, dy|
-      i = 1
-      while within_boundary?(x + i * dx, y + i * dy, board) 
-        new_x = x + i * dx
-        new_y = y + i * dy      
-        if !empty?(x + i * dx, y + i * dy, board) && opponent_piece?(x + i * dx, y + i * dy, board)
-          moves << [new_x, new_y]
-          break
-        end
-        break if !empty?(x + i * dx, y + i * dy, board) && !opponent_piece?(x + i * dx, y + i * dy, board)
-        i += 1
-      end
-    end
-    moves
   end
 
   def available_moves(board)
