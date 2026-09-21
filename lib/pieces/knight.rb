@@ -66,6 +66,11 @@ class Knight < Piece
     moves
   end
 
+  def moves(board)
+    x, y = @current_pos
+    iter(x, y, board)
+  end
+
   def available_moves(board)
     array = valid_moves(board) + valid_capture_moves(board)
     moves = {}

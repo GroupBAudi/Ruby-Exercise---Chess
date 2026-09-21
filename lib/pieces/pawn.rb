@@ -53,25 +53,24 @@ class Pawn < Piece
     end
     moves
   end
-  
-  def valid_capture_moves(board)
-    # return an array if there is a piece(s) diagonally
+
+  def diagonal_moves(board)
     x, y = @current_pos
     direction = @color == :white ? -1 : 1
-    captures = []
+    moves = []
     
     PAWN_MOVES[:capture].each do |dx, dy|
       new_x = x + dx * direction
       new_y = y + dy 
 
       next unless within_boundary?(new_x, new_y, board)
-
-      target = board.grid[new_x][new_y]
-      condition = target && target.color != @color
-      if condition
-        captures << [new_x, new_y]
-      end
+      moves << [new_x, new_y]
     end
+    moves
+  end
+  
+  def valid_capture_moves(board)
+    captures = diagonal_moves(board).select { |ele| board.piece_at(ele).color != color unless board.piece_at(ele).nil? }
     captures
   end
 
@@ -109,6 +108,10 @@ class Pawn < Piece
     move
   end
 
+  def moves(board)
+    []
+  end
+
   def en_passant_capture_position(to)
     # to get the coord behind the advancing pawn after executing enpassant
     direction = color == :white ? 1 : -1
@@ -130,6 +133,10 @@ class Pawn < Piece
     return nil unless valid_en_passant_move(board).include? (to)
 
     en_passant_capture_position(to)
+  end
+
+  def attacked_squares(board)
+    diagonal_moves(board)
   end
 
   def unusual_move

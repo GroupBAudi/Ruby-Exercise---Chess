@@ -67,10 +67,15 @@ class King < Piece
   end
 
   def empty?(row, col, board)
+     # we dont need to check row 8, -1, column -1. 8 etc
+    return false unless row.between?(0, 7) && col.between?(0, 7)
+
     board.grid[row][col].nil?
   end
 
   def opponent_piece?(row, col, board)
+    return false unless row.between?(0, 7) && col.between?(0, 7)
+    
     board.grid[row][col].color != @color
   end
 

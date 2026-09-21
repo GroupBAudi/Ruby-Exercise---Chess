@@ -38,4 +38,25 @@ module SlidingMovement
     end
     moves
   end
+
+  def slide(board)
+    # purpose for fuckall
+    x, y = @current_pos
+    moves = []
+
+    self.class::DIRECTIONS.each do |dx, dy|
+      arr = []
+      i = 1
+      while within_boundary?(x + i * dx, y + i * dy, board)
+        
+        new_x = x + i * dx
+        new_y = y + i * dy      
+
+        arr << [new_x, new_y]
+        i += 1
+      end
+      moves << arr
+    end
+    moves
+  end
 end
