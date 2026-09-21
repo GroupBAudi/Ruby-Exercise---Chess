@@ -9,7 +9,8 @@ class Piece
   def valid_moves(board)
   end
 
-  def moves
+  def moves(board)
+    slide(board)
   end
 
   def after_move(board)
@@ -20,5 +21,9 @@ class Piece
 
   def special_capture_position(board, to)
     nil
+  end
+
+  def attacked_squares(board)
+    valid_moves(board)
   end
 end
