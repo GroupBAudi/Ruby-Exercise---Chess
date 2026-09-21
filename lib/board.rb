@@ -160,78 +160,6 @@ class Board
     nil
   end
 
-  def king_under_attack?(color)
-    # check if color's king possible movement were under attack by opposing piece
-    # take every piece's current move, check if color's king possible move
-    curr_king_moves = piece_at(find_king(color)).valid_moves(self)
-
-    @grid.each do |row|
-      row.each do |col|
-        next if col.nil? || col.color == color
-        moves = col.attacked_squares(self)
-        # check if enemy available move overlaps with king's possible move
-        
-        return true if curr_king_moves.any? { |ele| moves.include?(ele) } 
-      end
-    end
-    false
-  end
-
-  def current_piece_attackers(piece)
-    # check what kind of pieces are attacking the parameter piece
-    # iterate through the board to find enemy color
-    # check all of their moves, see if it includes current piece's position
-    curr_piece_pos = piece.current_pos
-    attackers = []
-
-    @grid.each do |row|
-      row.each do |col|
-        next if col.nil? || col.color == piece.color
-        moves = col.moves(self)
-
-        attackers << col if moves.any? { |ele| ele.include?(curr_piece_pos) }
-      end
-    end
-
-    attackers
-  end
-
-  def reveal_king?(piece, color)
-    # take current piece, check if possible move reveal 
-    # if #slide attacks both king and current piece
-    # remove valid move where row / column would expose king
-    # The tested piece must be the only blocker between the enemy slider and the King.
-    
-    curr_king = piece_at(find_king(color))
-    victims = [piece, curr_king]
-
-    current_piece_attackers(piece).each do |enemy|
-      moves = enemy.moves(self)
-
-      # collect pieces by iterating
-      # slide
-      # if encounter piece, put in array
-      # array can hold max of two elements
-      # if pieces collected == victim and king, true
-
-      moves.each do |ray|
-        pieces = []
-        ray.each do |coor|
-          curr_piece = piece_at(coor)
-          next if curr_piece.nil?
-
-          pieces << curr_piece
-
-          if pieces.length == 2
-            return true if pieces == victims    
-            break
-          end
-        end
-      end 
-    end
-    false
-  end
-
   def legal_moves(piece)
     # for each of the current piece movement
     # see if any of its movement could cause the king still be in check
@@ -250,9 +178,8 @@ class Board
       self.grid[x][y] = piece
       piece.current_pos = coor
 
-      if in_check?(color) == false
-        valid_moves << coor
-      end
+      valid_moves << coor unless in_check?(color)
+
       # return state of board
       self.grid[x][y] = backup
       self.grid[curr_x][curr_y] = piece
@@ -261,129 +188,22 @@ class Board
   valid_moves
   end
 
-  def checkmate?(color)
-    #     in_check?(color)    legal moves exist?
-    # ────────────────────────────────────────
-    # true                true      → check, but not mate
-    # true                false     → CHECKMATE
-
-    # if king is incheck
-    # check every color's pieces legal moves
-    # if all return [] including king, checkmate
+  def endgame_status(color)
     moves = []
-    if in_check?(color)
-      @grid.each do |row|
-        row.each do |coor|
-          next if coor.nil? || coor.color != color
-          # current_piece = piece_at(coor)
-          moves << legal_moves(coor)
-        end
-      end  
+
+    @grid.each do |row|
+      row.each do |piece|
+        next if piece.nil? || piece.color != color
+
+        moves << legal_moves(piece)
+      end
     end
 
-    return true if moves.all? { |ele| ele == [] } && moves != []
-    false
-  end
-
-  def stalemate?(color)
-    #     in_check?(color)    legal moves exist?
-    # ────────────────────────────────────────
-    # false               true      → ordinary position
-    # false               false     → STALEMATE
-    
-    # if king is not incheck
-    # check if king is in danger of reveal
-    moves = []
-    unless in_check?(color)
-      @grid.each do |row|
-        row.each do |coor|
-          next if coor.nil? || coor.color != color
-          # current_piece = piece_at(coor)
-          moves << legal_moves(coor)
-        end
-      end  
+    if moves.all? { |move| move == [] } && moves != []
+      return :checkmate if in_check?(color)
+      return :stalemate
     end
 
-    return true if moves.all? { |ele| ele == [] } && moves != []
-    false
+    nil
   end
 end
-
-# board = Board.new
-# board.grid[4][4] = King.new(:white, [4, 4])
-# x = board.grid[4][4]
-# p x.empty?(-1, -1, board)
-
-################# CHECKMATE TEST ###################
-
-# board = Board.new
-
-# # Black King being checkmated
-# board.grid[0][0] = King.new(:black, [0, 0])
-
-# # Helpless Black pieces elsewhere
-# board.grid[0][7] = Rook.new(:black, [0, 7])
-# board.grid[3][6] = Bishop.new(:black, [3, 6])
-# board.grid[6][7] = Knight.new(:black, [6, 7])
-
-# # White mating pieces
-# board.grid[1][1] = Queen.new(:white, [1, 1])
-# board.grid[2][2] = King.new(:white, [2, 2])
-
-# board.render
-
-# puts "CHECKMATE TEST 1 — WITH HELPLESS FRIENDS"
-# puts "Black is in check: #{board.in_check?(:black)}"
-# puts "Black is checkmated: #{board.checkmate?(:black)}"
-
-# board = Board.new
-
-# board.grid[0][0] = King.new(:black, [0, 0])
-# board.grid[0][1] = Rook.new(:black, [0, 1])
-# board.grid[1][0] = Pawn.new(:black, [1, 0])
-# board.grid[1][1] = Pawn.new(:black, [1, 1])
-
-# board.grid[0][7] = Rook.new(:white, [0, 7])
-# board.grid[2][7] = King.new(:white, [2, 7])
-
-# board.render
-
-# puts "CHECKMATE TEST 2"
-# puts "Black is in check: #{board.in_check?(:black)}"
-# puts "Black is checkmated: #{board.checkmate?(:black)}"
-
-############### STALEMATE TEST ########################
-
-# board = Board.new
-
-# board.grid[0][0] = King.new(:black, [0, 0])
-# board.grid[1][2] = Queen.new(:white, [1, 2])
-# board.grid[2][1] = King.new(:white, [2, 1])
-
-# board.render
-
-# puts "STALEMATE TEST 1"
-# puts "Black is in check: #{board.in_check?(:black)}"
-# puts "Black is stalemated: #{board.stalemate?(:black)}"
-
-# puts "in_check?(:black)   => false"
-# puts "stalemate?(:black)  => true"
-
-# board = Board.new
-
-# # Black
-# board.grid[0][0] = King.new(:black, [0, 0])
-# board.grid[0][7] = Rook.new(:black, [0, 7])
-
-# board = Board.new
-
-# board.grid[0][0] = King.new(:black, [0, 0])   # a8
-# board.grid[1][2] = Queen.new(:white, [1, 2])  # c7
-# board.grid[2][1] = King.new(:white, [2, 1])   # b6
-
-# board.render
-# puts "STALEMATE TEST 1"
-# puts "Black in check:   #{board.in_check?(:black)}"     # expect false
-# puts "Black stalemated: #{board.stalemate?(:black)}"    # expect true
-# puts "King legal moves: #{board.legal_moves(board.grid[0][0]).inspect}"  # expect []
-  

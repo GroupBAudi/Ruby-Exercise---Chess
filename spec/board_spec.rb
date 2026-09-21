@@ -154,102 +154,6 @@ describe Board do
     end 
   end
 
-  describe "#reveal_king?" do
-    let(:board) { Board.new }
-
-    context "when another piece blocks the attack after the tested piece" do
-      it "returns false" do
-        board.grid[0][4] = Queen.new(:white, [0, 4])
-        board.grid[2][4] = Rook.new(:black, [2, 4])
-        board.grid[3][4] = Pawn.new(:black, [3, 4])
-        board.grid[5][4] = King.new(:black, [5, 4])
-
-        rook = board.piece_at([2, 4])
-
-        expect(board.reveal_king?(rook, :black)).to be false
-      end
-    end
-
-    context "when another piece blocks the attack before the tested piece" do
-      it "returns false" do
-        board.grid[0][4] = Queen.new(:white, [0, 4])
-        board.grid[1][4] = Pawn.new(:black, [1, 4])
-        board.grid[2][4] = Rook.new(:black, [2, 4])
-        board.grid[4][4] = King.new(:black, [4, 4])
-
-        rook = board.piece_at([2, 4])
-
-        expect(board.reveal_king?(rook, :black)).to be false
-      end
-    end
-
-    context "when another piece blocks a diagonal attack after the tested piece" do
-      it "returns false" do
-        board.grid[0][0] = Queen.new(:white, [0, 0])
-        board.grid[2][2] = Rook.new(:black, [2, 2])
-        board.grid[3][3] = Bishop.new(:black, [3, 3])
-        board.grid[5][5] = King.new(:black, [5, 5])
-
-        rook = board.piece_at([2, 2])
-
-        expect(board.reveal_king?(rook, :black)).to be false
-      end
-    end
-
-    context "when the tested piece is the sole blocker" do
-      it "returns true despite unrelated pieces elsewhere on the board" do
-        board.grid[0][4] = Queen.new(:white, [0, 4])
-        board.grid[2][4] = Rook.new(:black, [2, 4])
-        board.grid[4][4] = King.new(:black, [4, 4])
-
-        # Unrelated pieces
-        board.grid[1][1] = Pawn.new(:black, [1, 1])
-        board.grid[3][7] = Bishop.new(:black, [3, 7])
-        board.grid[6][2] = Knight.new(:white, [6, 2])
-
-        rook = board.piece_at([2, 4])
-
-        expect(board.reveal_king?(rook, :black)).to be true
-      end
-    end
-
-    context "when the tested piece blocks a file attack on its King" do
-      it "returns true" do
-        board.grid[4][4] = King.new(:black, [4, 4])
-        board.grid[2][4] = Rook.new(:black, [2, 4])
-        board.grid[0][4] = Queen.new(:white, [0, 4])
-
-        rook = board.piece_at([2, 4])
-
-        expect(board.reveal_king?(rook, :black)).to be true
-      end
-    end
-
-    context "when the tested piece blocks a diagonal attack on its King" do
-      it "returns true" do
-        board.grid[4][4] = King.new(:black, [4, 4])
-        board.grid[2][2] = Rook.new(:black, [2, 2])
-        board.grid[0][0] = Queen.new(:white, [0, 0])
-
-        rook = board.piece_at([2, 2])
-
-        expect(board.reveal_king?(rook, :black)).to be true
-      end
-    end
-
-    context "when the attacker is not aligned with the King" do
-      it "returns false" do
-        board.grid[4][4] = King.new(:black, [4, 4])
-        board.grid[2][4] = Rook.new(:black, [2, 4])
-        board.grid[0][0] = Queen.new(:white, [0, 0])
-
-        rook = board.piece_at([2, 4])
-
-        expect(board.reveal_king?(rook, :black)).to be false
-      end
-    end
-  end
-  
   describe "#legal_moves" do
     let(:board) { Board.new }
 
@@ -330,40 +234,38 @@ describe Board do
     end
   end
 
-    describe "endgame conditions" do
+  describe "endgame conditions" do
     let(:board) { Board.new }
 
-    describe "#checkmate?" do
-      context "when the King is in check and no piece can resolve it" do
-        it "returns true" do
-          board.grid[0][0] = King.new(:black, [0, 0])
+    context "when the King is in check and no piece can resolve it" do
+      it "returns :checkmate" do
+        board.grid[0][0] = King.new(:black, [0, 0])
 
-          # Other black pieces cannot resolve the check
-          board.grid[0][7] = Rook.new(:black, [0, 7])
-          board.grid[3][6] = Bishop.new(:black, [3, 6])
-          board.grid[6][7] = Knight.new(:black, [6, 7])
+        # Other black pieces cannot resolve the check
+        board.grid[0][7] = Rook.new(:black, [0, 7])
+        board.grid[3][6] = Bishop.new(:black, [3, 6])
+        board.grid[6][7] = Knight.new(:black, [6, 7])
 
-          board.grid[1][1] = Queen.new(:white, [1, 1])
-          board.grid[2][2] = King.new(:white, [2, 2])
+        board.grid[1][1] = Queen.new(:white, [1, 1])
+        board.grid[2][2] = King.new(:white, [2, 2])
 
-          expect(board.in_check?(:black)).to be true
-          expect(board.checkmate?(:black)).to be true
-        end
+        expect(board.in_check?(:black)).to be true
+        expect(board.endgame_status(:black)).to eq(:checkmate)
       end
+    end
 
-      context "when the King is not in check" do
-        it "returns false" do
-          board.grid[0][0] = King.new(:black, [0, 0])
-          board.grid[0][1] = Rook.new(:black, [0, 1])
-          board.grid[1][0] = Pawn.new(:black, [1, 0])
-          board.grid[1][1] = Pawn.new(:black, [1, 1])
+    context "when the King is not in check" do
+      it "returns nil" do
+        board.grid[0][0] = King.new(:black, [0, 0])
+        board.grid[0][1] = Rook.new(:black, [0, 1])
+        board.grid[1][0] = Pawn.new(:black, [1, 0])
+        board.grid[1][1] = Pawn.new(:black, [1, 1])
 
-          board.grid[0][7] = Rook.new(:white, [0, 7])
-          board.grid[2][7] = King.new(:white, [2, 7])
+        board.grid[0][7] = Rook.new(:white, [0, 7])
+        board.grid[2][7] = King.new(:white, [2, 7])
 
-          expect(board.in_check?(:black)).to be false
-          expect(board.checkmate?(:black)).to be false
-        end
+        expect(board.in_check?(:black)).to be false
+        expect(board.endgame_status(:black)).to eq(nil)
       end
     end
 
@@ -376,7 +278,7 @@ describe Board do
 
           expect(board.in_check?(:black)).to be false
           expect(board.legal_moves(board.grid[0][0])).to be_empty
-          expect(board.stalemate?(:black)).to be true
+          expect(board.endgame_status(:black)).to eq(:stalemate)
         end
       end
 
@@ -393,7 +295,7 @@ describe Board do
           expect(board.in_check?(:black)).to be false
           expect(board.legal_moves(king)).to be_empty
           expect(board.legal_moves(pawn)).not_to be_empty
-          expect(board.stalemate?(:black)).to be false
+          expect(board.endgame_status(:black)).to eq(nil)
         end
       end
     end
