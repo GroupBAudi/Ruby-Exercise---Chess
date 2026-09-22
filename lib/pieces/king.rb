@@ -28,7 +28,7 @@ class King < Piece
     @default_position = color == :white ? [7, position[1]] : [0, position[1]]
     @last_pos = []
     @check = false
-    # @castle = false
+    @castle = true
   end
 
   def within_boundary?(row, col, board)
@@ -79,10 +79,42 @@ class King < Piece
     board.grid[row][col].color != @color
   end
   
-  # def after_move(board)
-  #   # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
-  # end
+  def after_move(board)
+    # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
+    @castle = false
+  end
 
-  # def expire_move_state
-  # end
+  def valid_castle_moves(board)
+    king_row, king_col = @current_pos
+    moves = []
+
+    board.grid[king_row].each do |coor|
+      next unless coor.is_a?(Rook)
+
+      if coor.castle
+        if coor.current_pos[1] < king_col
+          moves << [king_row, king_col - 2]
+        elsif coor.current_pos[1] > king_col
+          moves << [king_row, king_col + 2]
+        end
+      end
+    end
+
+    moves
+  end
+
+  def castle(board, destination)
+    col = @current_pos[1]
+    destination_row, destination_col = destination
+
+    board.place_piece(@current_pos, destination, self)
+
+    if destination[1] < col
+      rook = board.grid[destination_row][destination_col - 2]
+      board.place_piece(rook.current_pos, [destination_row, destination_col + 1], rook)
+    elsif destination[1] > col
+      rook = board.grid[destination_row][destination_col + 1]
+      board.place_piece(rook.current_pos, [destination_row, destination_col - 1], rook)
+    end
+  end
 end

@@ -22,7 +22,7 @@ class Rook < Piece
     @symbol = color == :white ? "♖" : "♜"
     @default_position = color == :white ? [7, position[1]] : [0, position[1]]
     @last_pos = []
-    # @castle = false
+    @castle = true
   end
 
   def within_boundary?(row, col, board)
@@ -37,10 +37,8 @@ class Rook < Piece
     board.grid[row][col].color != @color
   end
   
-  # def after_move(board)
-  #   # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
-  # end
-
-  # def expire_move_state
-  # end
+  def after_move(board)
+    # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
+    @castle = false
+  end
 end
