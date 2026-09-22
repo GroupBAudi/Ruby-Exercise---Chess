@@ -38,11 +38,4 @@ class Bishop < Piece
   def opponent_piece?(row, col, board)
     board.grid[row][col].color != @color
   end
-
-  def available_moves(board)
-    array = valid_moves(board) + valid_capture_moves(board)
-    moves = {}
-    array.each_with_index { |cell, i| moves[i] = cell }
-    moves
-  end
 end

@@ -74,13 +74,6 @@ class Pawn < Piece
     captures
   end
 
-  def available_moves(board)
-    array = valid_moves(board) + valid_capture_moves(board) + valid_en_passant_move(board)
-    moves = {}
-    array.each_with_index { |cell, i| moves[i] = cell }
-    moves
-  end
-
   def en_passant?(board)
     start_row = @default_position[0]
     x = @current_pos[0]

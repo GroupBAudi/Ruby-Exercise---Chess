@@ -36,14 +36,7 @@ class Rook < Piece
   def opponent_piece?(row, col, board)
     board.grid[row][col].color != @color
   end
-
-  def available_moves(board)
-    array = valid_moves(board) + valid_capture_moves(board)
-    moves = {}
-    array.each_with_index { |cell, i| moves[i] = cell }
-    moves
-  end
-
+  
   # def after_move(board)
   #   # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
   # end

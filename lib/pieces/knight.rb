@@ -70,11 +70,4 @@ class Knight < Piece
     x, y = @current_pos
     iter(x, y, board)
   end
-
-  def available_moves(board)
-    array = valid_moves(board) + valid_capture_moves(board)
-    moves = {}
-    array.each_with_index { |cell, i| moves[i] = cell }
-    moves
-  end
 end
