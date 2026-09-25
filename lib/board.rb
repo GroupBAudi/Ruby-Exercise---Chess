@@ -12,6 +12,17 @@ class Board
   attr_reader :grid
   attr_accessor :removed_piece, :move_history
 
+  BACK_RANK = [
+    Rook,
+    Knight,
+    Bishop,
+    Queen,
+    King,
+    Bishop,
+    Knight,
+    Rook
+  ]
+
   include Renderer
 
   def initialize
@@ -29,24 +40,10 @@ class Board
       @grid[1][col] = Pawn.new(:black, [1, col])
     end
   
-    # setup any other pieces
-    (0..1).each_with_index do |x, i|
-      i = 1
-      i = -1 if x == 1
-      @grid[7][(0 + x) * i] = Rook.new(:white, [7, (0 + x) * i])
-      @grid[7][(1 + x) * i] = Knight.new(:white, [7, (1 + x) * i])
-      @grid[7][(2 + x) * i] = Bishop.new(:white, [7, (2 + x) * i])
-      @grid[0][(0 + x) * i] = Rook.new(:black, [0, (0 + x) * i])
-      @grid[0][(1 + x) * i] = Knight.new(:black, [0, (1 + x) * i])
-      @grid[0][(2 + x) * i] = Bishop.new(:black, [0, (2 + x) * i])
-    end
-
-    # setup king and queen because irl courtship doesn't work like that
-    [0, 7].each do |i|
-      x = :black
-      x = :white if i == 7
-      @grid[i][3] = Queen.new(x, [i, 3])
-      @grid[i][4] = King.new(x, [i, 4])
+    # setup back rank pieces
+    BACK_RANK.each_with_index do |piece_class, col|
+      @grid[7][col] = piece_class.new(:white, [7, col])
+      @grid[0][col] = piece_class.new(:black, [0, col])
     end
   end
 
