@@ -31,10 +31,6 @@ class King < Piece
     @castle = true
   end
 
-  def within_boundary?(row, col, board)
-    row.between?(0, board.grid.length - 1) && col.between?(0, board.grid.length - 1)
-  end
-
   def valid_moves(board)
     x, y = @current_pos
     moves = []
@@ -66,19 +62,6 @@ class King < Piece
     moves
   end
 
-  def empty?(row, col, board)
-     # we dont need to check row 8, -1, column -1. 8 etc
-    return false unless row.between?(0, 7) && col.between?(0, 7)
-
-    board.grid[row][col].nil?
-  end
-
-  def opponent_piece?(row, col, board)
-    return false unless row.between?(0, 7) && col.between?(0, 7)
-    
-    board.grid[row][col].color != @color
-  end
-  
   def after_move(board)
     # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
     @castle = false

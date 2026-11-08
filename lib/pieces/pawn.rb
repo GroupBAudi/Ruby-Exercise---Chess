@@ -22,11 +22,7 @@ class Pawn < Piece
     @last_pos = []
     @en_passant = false
   end
-
-  def within_boundary?(row, col, board)
-    row.between?(0, board.grid.length - 1) && col.between?(0, board.grid.length - 1)
-  end
-
+  
   def check_collision?(row, col, two_step, board)
     board.grid[row][col].nil? && board.grid[two_step][col].nil?
   end

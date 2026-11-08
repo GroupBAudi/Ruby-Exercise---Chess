@@ -26,16 +26,4 @@ class Bishop < Piece
     @default_position = color == :white ? [7, position[1]] : [0, position[1]]
     @last_pos = []
   end
-
-  def within_boundary?(row, col, board)
-    row.between?(0, board.grid.length - 1) && col.between?(0, board.grid.length - 1)
-  end
-
-  def empty?(row, col, board)
-    board.grid[row][col].nil?
-  end
-
-  def opponent_piece?(row, col, board)
-    board.grid[row][col].color != @color
-  end
 end

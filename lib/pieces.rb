@@ -26,4 +26,21 @@ class Piece
   def attacked_squares(board)
     valid_moves(board)
   end
+
+  def within_boundary?(row, col, board)
+    row.between?(0, board.grid.length - 1) && col.between?(0, board.grid.length - 1)
+  end
+  
+  def empty?(row, col, board)
+    return false unless within_boundary?(row, col, board)
+
+    board.grid[row][col].nil?
+  end
+
+  def opponent_piece?(row, col, board)
+    return false unless within_boundary?(row, col, board)
+
+    target = board.grid[row][col]
+    !target.nil? && target.color != @color
+  end
 end

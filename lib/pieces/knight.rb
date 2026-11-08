@@ -24,18 +24,6 @@ class Knight < Piece
     @last_pos = []
   end
 
-  def within_boundary?(row, col, board)
-    row.between?(0, board.grid.length - 1) && col.between?(0, board.grid.length - 1)
-  end
-
-  def empty?(row, col, board)
-    board.grid[row][col].nil?
-  end
-
-  def opponent_piece?(row, col, board)
-    board.grid[row][col].color != @color
-  end
-
   def iter(row, col, board)
     moves = []
     DIRECTIONS.each do |dx, dy|

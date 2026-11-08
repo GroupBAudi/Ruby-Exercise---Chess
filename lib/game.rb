@@ -109,7 +109,6 @@ class Game
 
       move_piece(available_moves, piece, player_input)
       swap_turn
-      @board.render
       puts ""
     end
   end

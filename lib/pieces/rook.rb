@@ -24,18 +24,6 @@ class Rook < Piece
     @last_pos = []
     @castle = true
   end
-
-  def within_boundary?(row, col, board)
-    row.between?(0, board.grid.length - 1) && col.between?(0, board.grid.length - 1)
-  end
-
-  def empty?(row, col, board)
-    board.grid[row][col].nil?
-  end
-
-  def opponent_piece?(row, col, board)
-    board.grid[row][col].color != @color
-  end
   
   def after_move(board)
     # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
