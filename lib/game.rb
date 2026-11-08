@@ -1,12 +1,13 @@
 require_relative 'board'
 require_relative 'player'
 require_relative 'helpers/board_parser'
+require_relative 'helpers/save_game'
 
 class Game
   attr_reader :board
   attr_accessor :current_player
 
-  include BoardParser
+  include BoardParser, SaveGame
 
   def initialize(board = Board.new)
     @board = board
@@ -157,6 +158,3 @@ class Game
     @current_player.captured_pieces << captured_piece if captured_piece
   end
 end
-
-game = Game.new
-game.play_turn
