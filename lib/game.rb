@@ -88,6 +88,7 @@ class Game
     # check endgame_status for the new current player
     # render board again
     loop do
+      break if game_over?
       @board.render
       puts "Get move (choose a2, b1 etc)"
       piece = get_piece(player_input)
@@ -108,26 +109,26 @@ class Game
 
       move_piece(available_moves, piece, player_input)
       swap_turn
-      status = @board.endgame_status(@current_player.color)
-      # status if board.in_check?(@current_player.color)
       @board.render
       puts ""
     end
   end
 
-  # def check_game_status
-  #   status = @board.endgame_status(@current_player.color)
+  def game_over?
+    status = @board.endgame_status(@current_player.color)
 
-  #   case status
-  #   when :checkmate
-  #     # announce + indicate game should end
-  #   when :stalemate
-  #     # announce + indicate game should end
-  #   else
-  #     # maybe check ordinary in_check? here
-  #     puts "checkmate"
-  #   end
-  # end
+    case status
+    when :checkmate
+      puts "checkmate"
+      return true
+    when :stalemate
+      puts "stalemate"
+      return true
+    else
+      # maybe check ordinary in_check? here
+      puts "check" if @board.in_check?(@current_player.color)
+    end
+  end
 
   def get_piece(player_input)
     @board.piece_at(player_input)
