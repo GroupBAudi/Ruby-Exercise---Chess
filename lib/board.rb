@@ -162,7 +162,8 @@ class Board
     # see if any of its movement could cause the king still be in check
     # push to array all the valid movements under the condition check is false
     color = piece.color
-    curr_piece_moves = piece.valid_moves(self)
+    curr_piece_moves = piece.valid_moves(self) +
+                   piece.valid_capture_moves(self)
     valid_moves = []
 
     curr_piece_moves.each do |coor|
