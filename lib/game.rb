@@ -109,6 +109,7 @@ class Game
       next if player_input == :cancel
 
       move_piece(available_moves, piece, player_input)
+      promotion_available?(piece)
       swap_turn
       puts ""
     end
@@ -127,6 +128,43 @@ class Game
     else
       # maybe check ordinary in_check? here
       puts "check" if @board.in_check?(@current_player.color)
+    end
+  end
+
+  def promotion_available?(piece)
+    # get piece's current position, check if it is a pawn and if it is on the back rank
+    x, y = piece.current_pos
+    backrank = piece.color == :white ? [0, y] : [7, y]
+
+    if piece.is_a?(Pawn) && piece.current_pos == backrank
+      p "Promotion!"
+      # prompt class, color, pass pawn's current pos
+      @board.promote_piece(piece, promotion_prompt)
+    end
+  end
+
+  def promotion_prompt
+    # give choice, 0 is queen 1 is rook 2 is knight 3 is bishop
+    hash = {}
+    classes = [Queen, Rook, Knight, Bishop].each_with_index { |c, i| hash[i] = c }
+    puts hash
+
+    loop do
+      input = gets.chomp.strip.slice(0, 1)
+    
+      if input.match?(/^[0-3]$/i)
+        case input.to_i
+        when 0
+          return Queen
+        when 1
+          return Rook
+        when 2
+          return Knight
+        when 3
+          return Bishop
+        end
+      end
+      puts "Invalid input. Enter a number between 0 and 3."
     end
   end
 

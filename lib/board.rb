@@ -54,6 +54,15 @@ class Board
     move_to(from, to, piece)
   end
 
+  def promote_piece(piece, choice)
+    # take piece, copy its color and position
+    # erase the current index
+    # in the same index, initialize new piece
+    x, y = piece.current_pos
+    color = piece.color
+    @grid[x][y] = choice.new(color, piece.current_pos)
+  end
+
   def capturing_condition(to)
     target = piece_at(to)
     !target.nil?
