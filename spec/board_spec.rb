@@ -300,5 +300,70 @@ describe Board do
       end
     end
   end
+  describe '#promote_piece' do
+    let(:board) { Board.new }
+    let(:position) { [0, 4] }
+    let(:pawn) { Pawn.new(:white, position) }
+
+    before do
+      board.grid[0][4] = pawn
+    end
+
+    context 'when promoting to a Queen' do
+      it 'replaces the Pawn with a Queen' do
+        board.promote_piece(pawn, Queen)
+
+        expect(board.piece_at(position)).to be_a(Queen)
+      end
+    end
+
+    context 'when promoting to a Rook' do
+      it 'replaces the Pawn with a Rook' do
+        board.promote_piece(pawn, Rook)
+
+        expect(board.piece_at(position)).to be_a(Rook)
+      end
+    end
+
+    context 'when promoting to a Knight' do
+      it 'replaces the Pawn with a Knight' do
+        board.promote_piece(pawn, Knight)
+
+        expect(board.piece_at(position)).to be_a(Knight)
+      end
+    end
+
+    context 'when promoting to a Bishop' do
+      it 'replaces the Pawn with a Bishop' do
+        board.promote_piece(pawn, Bishop)
+
+        expect(board.piece_at(position)).to be_a(Bishop)
+      end
+    end
+
+    context 'when a Pawn is promoted' do
+      it 'preserves the original Pawn color' do
+        board.promote_piece(pawn, Queen)
+
+        promoted_piece = board.piece_at(position)
+
+        expect(promoted_piece.color).to eq(:white)
+      end
+
+      it 'preserves the original Pawn position' do
+        board.promote_piece(pawn, Knight)
+
+        promoted_piece = board.piece_at(position)
+
+        expect(promoted_piece.current_pos).to eq(position)
+      end
+
+      it 'replaces the original Pawn instance' do
+        board.promote_piece(pawn, Queen)
+
+        expect(board.piece_at(position)).not_to be(pawn)
+      end
+    end
+  end
 end
 
