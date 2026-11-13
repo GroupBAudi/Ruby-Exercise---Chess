@@ -11,4 +11,8 @@ class Player
   def to_s
     "#{name} (#{color})"
   end
+
+  def show_captured_pieces
+    @captured_pieces.map(&:symbol).join(' ')
+  end
 end

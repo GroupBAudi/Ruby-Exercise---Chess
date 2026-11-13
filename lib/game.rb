@@ -2,12 +2,13 @@ require_relative 'board'
 require_relative 'player'
 require_relative 'helpers/board_parser'
 require_relative 'helpers/save_game'
+require_relative 'helpers/renderer'
 
 class Game
-  attr_reader :board
+  attr_reader :board, :player_one, :player_two
   attr_accessor :current_player
 
-  include BoardParser, SaveGame
+  include BoardParser, SaveGame, Renderer
 
   def initialize(board = Board.new)
     @board = board
@@ -15,6 +16,7 @@ class Game
     @player_two = Player.new("Player two", :black)
     @current_player = @player_one
     @board.setup_pieces
+    @message = nil
   end
 
   def swap_turn
@@ -25,7 +27,7 @@ class Game
     row, col = player_input
     piece = @board.grid[row][col]
     if @current_player.color != piece.color
-      puts "#{reparse(player_input)} is #{piece.color}'s piece"
+      @message = "#{reparse(player_input)} is #{piece.color}'s piece"
       return false
     end
     true
@@ -34,7 +36,7 @@ class Game
   def spot_empty?(player_input)
     row, col = player_input
     if @board.grid[row][col].nil?
-      puts "#{reparse(player_input)} is empty"
+      @message = "#{reparse(player_input)} is empty"
       return false
     end
     true
@@ -42,13 +44,21 @@ class Game
 
   def player_input
     loop do
-      input = gets.chomp.strip.slice(0, 2)
-      if input.match?(/^[a-h][1-8]$/i)
-        player_input = parse(input)
-        verified_input = input.match?(/^[a-h][1-8]$/i) && spot_empty?(player_input)
+      render_screen("Get move (choose a2, b1 etc)")
+
+      input = gets.chomp.strip
+
+      unless input.match?(/\A[a-h][1-8]\z/i)
+        @message = "Invalid coordinate. Enter a square like a2 or e4."
+        next
       end
-      return player_input if verified_input && correct_player_piece?(player_input)
-      puts "Invalid coordinate. Enter a square like a2 or e4."
+
+      coordinate = parse(input)
+
+      if spot_empty?(coordinate) && correct_player_piece?(coordinate)
+        @message = nil
+        return coordinate
+      end
     end
   end
 
@@ -56,12 +66,21 @@ class Game
     loop do
       player_input = gets.chomp.strip
 
-      return player_input if player_input.match?(/^[a-h][1-8]$/i) || player_input.match?(/^\d+$/) || player_input.match?(/^(cancel|c|back|b)$/i)
+      if player_input.match?(/\A[a-h][1-8]\z/i) ||
+        player_input.match?(/\A\d+\z/) ||
+        player_input.match?(/^(cancel|c|back|b|e|exit)$/i)
 
-      puts "Invalid coordinate. Enter a square like a2 or e4."
+        @message = nil
+        return player_input
+      end
+
+      @message = "Invalid coordinate. Enter a square like a2 or e4."
+      render_screen(
+        "Choose a move"
+      )
     end
   end
-
+  
   def verify_input(available_moves)
     # check player input if it goes out of bound
     # if it does prompt back for move
@@ -69,41 +88,45 @@ class Game
     loop do
       input = move_input
 
-      if input.match?(/^\d+$/)
+      display_moves = available_moves.map{ |x, y| "#{x}: " + reparse(y) }
+      
+      return :cancel if input.match?(/^(cancel|c|back|b|e|exit)$/i)
+
+      if input.match?(/\A\d+\z/) # regex checks for index style input
         return input if available_moves.key?(input.to_i)
       else
         return input if available_moves.value?(parse(input))
       end
 
-      return :cancel if input.match?(/^(cancel|c|back|b)$/i)
-
-      puts "out of range"
+      render_screen(
+        "That move is out of range. Please choose a valid move.",
+        display_moves.join("\n")
+        )
     end
   end
 
   def play_turn
-    # render board
     # ask for move
     # pick/execute what kind of move
     # swap turn
     # check endgame_status for the new current player
-    # render board again
     loop do
       break if game_over?
-      @board.render
-      puts "Get move (choose a2, b1 etc)"
+      
       piece = get_piece(player_input)
       available_moves = show_available_moves(piece)
 
       if available_moves.empty?
-        puts "That has no legal moves"
+        render_screen("That has no legal moves")
         next
       end
 
-      puts "Choose move (input array index, 0 - n OR type coordinate; or '_c_ancel' or '_b_ack' to cancel)"
-      display_moves = available_moves.map{ |x, y| "#{x}: " + reparse(y) }
-      p display_moves
-
+      render_screen(
+        "Choose move (input array index, 0 - n OR type coordinate; or '_c_ancel' or '_b_ack' to cancel)",
+        "Piece selected #{reparse(piece.current_pos)}",
+        available_moves.map{ |x, y| "#{x}: " + reparse(y) }.join("\n")
+      )
+      
       player_input = verify_input(available_moves)
 
       next if player_input == :cancel
@@ -185,7 +208,7 @@ class Game
       # coordinate style: "a4"
       player_input = parse(player_input)
       move_chosen = available_moves.values.find { |x| x == player_input}
-    elsif player_input.match?(/^\d+$/)
+    elsif player_input.match?(/\A\d+\z/)
       # index style: "0", "1", "2"...
       player_input = player_input.to_i
       move_chosen = available_moves[player_input]
