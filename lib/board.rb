@@ -42,9 +42,13 @@ class Board
   
     # setup back rank pieces
     BACK_RANK.each_with_index do |piece_class, col|
-      @grid[7][col] = piece_class.new(:white, [7, col])
+      # @grid[7][col] = piece_class.new(:white, [7, col])
       @grid[0][col] = piece_class.new(:black, [0, col])
     end
+
+    @grid[7][0] = Rook.new(:white, [7, 0])
+    @grid[7][7] = Rook.new(:white, [7, 7])
+    @grid[7][4] = King.new(:white, [7, 4])
   end
 
   def move_piece(from, to)
@@ -69,13 +73,17 @@ class Board
   end
 
   def move_to(from, to, piece)
-    special_capture = piece.special_capture_position(self, to)
+    special_capture = piece.special_capture_move(self, to)
+    special_move = piece.special_move(self, to)
     if capturing_condition(to)
       # if piece exists and target is occupied
       capture(from, to, piece)
+    elsif special_move
+      # if piece is a king and has castling move available
+      place_piece(from, to, piece)
     elsif special_capture
       # if piece is a pawn and has en passant move available
-      capture(from, to, piece, special_capture)
+      # capture(from, to, piece, special_move)
     else
       # just place piece if anything
       place_piece(from, to, piece)
@@ -171,8 +179,7 @@ class Board
     # see if any of its movement could cause the king still be in check
     # push to array all the valid movements under the condition check is false
     color = piece.color
-    curr_piece_moves = piece.valid_moves(self) +
-                   piece.valid_capture_moves(self)
+    curr_piece_moves = piece.universal_moves(self)
     valid_moves = []
 
     curr_piece_moves.each do |coor|
@@ -214,3 +221,26 @@ class Board
     nil
   end
 end
+
+require_relative 'player'
+
+p1 = Player.new("test", :white)
+p2 = Player.new("test", :black)
+
+board = Board.new
+board.setup_pieces
+board.render(p1, p2)
+
+king = board.grid[7][4]
+rook1 = board.grid[7][0]
+rook2 = board.grid[7][7]
+
+king.castle(board, [7, 2])
+# p king
+# p rook1.current_pos
+# p rook2
+# p p1.captured_pieces # captured piece no longer a concern
+# king = board.grid[7][6]
+p king.valid_castle_moves(board)
+
+board.render(p1, p2)

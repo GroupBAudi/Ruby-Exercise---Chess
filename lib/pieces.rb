@@ -19,12 +19,23 @@ class Piece
   def expire_move_state
   end
 
-  def special_capture_position(board, to)
+  def special_move(board, to)
+    # special move like castling
     nil
+  end
+
+  def special_capture_move(board, to)
+    # special capture like en passant
+    nil 
   end
 
   def attacked_squares(board)
     valid_moves(board)
+  end
+
+  def universal_moves(board)
+    # combined capture and non-capture moves
+    valid_moves(board) + valid_capture_moves(board)
   end
 
   def within_boundary?(row, col, board)

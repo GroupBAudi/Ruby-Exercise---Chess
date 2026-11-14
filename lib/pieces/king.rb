@@ -62,9 +62,8 @@ class King < Piece
     moves
   end
 
-  def after_move(board)
-    # do stuff after something move i.e. pawn move for en passant, king move after checked expires castling
-    @castle = false
+  def expire_move_state
+    self.castle = false
   end
 
   def valid_castle_moves(board)
@@ -99,5 +98,16 @@ class King < Piece
       rook = board.grid[destination_row][destination_col + 1]
       board.place_piece(rook.current_pos, [destination_row, destination_col - 1], rook)
     end
+    expire_move_state
+  end
+
+  def universal_moves(board)
+    super + valid_castle_moves(board)
+  end
+
+  def special_move(board, to)
+    return nil unless valid_castle_moves(board).include?(to)
+
+    castle(board, to)
   end
 end

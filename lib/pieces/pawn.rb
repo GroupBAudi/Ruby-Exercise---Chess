@@ -118,7 +118,7 @@ class Pawn < Piece
     self.en_passant = false
   end
 
-  def special_capture_position(board, to)
+  def special_capture_move(board, to)
     return nil unless valid_en_passant_move(board).include? (to)
 
     en_passant_capture_position(to)

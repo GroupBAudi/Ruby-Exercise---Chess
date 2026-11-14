@@ -216,6 +216,6 @@ class Game
     # 2. Tell the board to execute the move and CATCH the returned item (if any)
     captured_piece = @board.move_piece(piece.current_pos, move_chosen)
     # 3. if an item is returned, increment to current player captured pieces
-    @current_player.captured_pieces << captured_piece if captured_piece
+    @current_player.captured_pieces << captured_piece if captured_piece && captured_piece.color != @current_player.color
   end
 end
