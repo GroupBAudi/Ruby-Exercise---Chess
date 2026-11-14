@@ -73,7 +73,7 @@ class King < Piece
     board.grid[king_row].each do |coor|
       next unless coor.is_a?(Rook)
 
-      if coor.castle
+      if coor.castle && self.castle
         if coor.current_pos[1] < king_col
           moves << [king_row, king_col - 2]
         elsif coor.current_pos[1] > king_col
@@ -85,7 +85,7 @@ class King < Piece
     moves
   end
 
-  def castle(board, destination)
+  def castle_move(board, destination)
     col = @current_pos[1]
     destination_row, destination_col = destination
 
@@ -108,6 +108,6 @@ class King < Piece
   def special_move(board, to)
     return nil unless valid_castle_moves(board).include?(to)
 
-    castle(board, to)
+    castle_move(board, to)
   end
 end
