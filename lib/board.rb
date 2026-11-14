@@ -42,13 +42,9 @@ class Board
   
     # setup back rank pieces
     BACK_RANK.each_with_index do |piece_class, col|
-      # @grid[7][col] = piece_class.new(:white, [7, col])
+      @grid[7][col] = piece_class.new(:white, [7, col])
       @grid[0][col] = piece_class.new(:black, [0, col])
     end
-
-    @grid[7][0] = Rook.new(:white, [7, 0])
-    @grid[7][7] = Rook.new(:white, [7, 7])
-    @grid[7][4] = King.new(:white, [7, 4])
   end
 
   def move_piece(from, to)
@@ -156,8 +152,23 @@ class Board
         moves = col.valid_capture_moves(self)
 
         moves.each do |ele|
-          return true if piece_at(ele).is_a?(King) && piece_at(ele).color == color
+          piece = piece_at(ele)
+          
+          return true if piece.is_a?(King) && piece.color == color
         end
+      end
+    end
+    false
+  end
+
+  def piece_under_attack?(position, color)
+    # simulate a piece being attacked by stubbing its position and see what happened
+    @grid.each do |row|
+      row.each do |col|
+        next if col.nil? || col.color == color
+        moves = col.attacked_squares(self)
+
+        return true if moves.include?(position)
       end
     end
     false
@@ -221,26 +232,3 @@ class Board
     nil
   end
 end
-
-require_relative 'player'
-
-p1 = Player.new("test", :white)
-p2 = Player.new("test", :black)
-
-board = Board.new
-board.setup_pieces
-board.render(p1, p2)
-
-king = board.grid[7][4]
-rook1 = board.grid[7][0]
-rook2 = board.grid[7][7]
-
-king.castle(board, [7, 2])
-# p king
-# p rook1.current_pos
-# p rook2
-# p p1.captured_pieces # captured piece no longer a concern
-# king = board.grid[7][6]
-p king.valid_castle_moves(board)
-
-board.render(p1, p2)

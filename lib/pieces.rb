@@ -30,11 +30,12 @@ class Piece
   end
 
   def attacked_squares(board)
-    valid_moves(board)
+    # combination of only move and attack to threaten areas
+    valid_moves(board) + valid_capture_moves(board)
   end
 
   def universal_moves(board)
-    # combined capture and non-capture moves
+    # combined capture and non-capture moves and others
     valid_moves(board) + valid_capture_moves(board)
   end
 

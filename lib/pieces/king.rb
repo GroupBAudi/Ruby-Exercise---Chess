@@ -67,16 +67,20 @@ class King < Piece
   end
 
   def valid_castle_moves(board)
-    king_row, king_col = @current_pos
+    king_row, king_col = self.current_pos
     moves = []
 
     board.grid[king_row].each do |coor|
       next unless coor.is_a?(Rook)
 
+      # if king's direction to is under attack then it can't castle
+      # temporarily store king state in certain direction, and see for check
+      # if check reject it
+
       if coor.castle && self.castle
-        if coor.current_pos[1] < king_col
+        if coor.current_pos[1] < king_col && !board.piece_under_attack?([king_row, king_col - 1], self.color) && !board.piece_under_attack?([king_row, king_col - 2], self.color)
           moves << [king_row, king_col - 2]
-        elsif coor.current_pos[1] > king_col
+        elsif coor.current_pos[1] > king_col && !board.piece_under_attack?([king_row, king_col + 1], self.color) && !board.piece_under_attack?([king_row, king_col + 2], self.color)
           moves << [king_row, king_col + 2]
         end
       end
